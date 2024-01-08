@@ -3,11 +3,21 @@ import 'dart:io';
 void main() {
   var filePath = '/Users/bennalls/Developer/Advent of Code/2023/Day 7/input.txt';
   List<String> lines = readLines(filePath);
-  print(lines);
+  // print(lines);
   List<List<String>> hands = lines.map((line) => line.split(' ').toList()).toList();
-  print(hands);
-// Part 1
+  // print(hands);
 
+// Part 1
+  List<CardHand> cardHands = [for (List<String> hand in hands) CardHand(hand[0].split(''), int.parse(hand[1]))];
+  sortHands(cardHands);
+  // print('Sorted hands: $cardHands');
+  int score = 0;
+  for (int rank = cardHands.length; rank > 0; rank--) {
+    score += cardHands[cardHands.length - rank].wager * rank;
+    print(
+        'rank: $rank cardhand: ${cardHands[cardHands.length - rank]}, value: ${cardHands[cardHands.length - rank].wager * rank}, totalCumScore: $score');
+  }
+  print('Part 1: Total score: $score');
 // Part 2
 }
 
@@ -27,6 +37,7 @@ List<String> readLines(String filePath) {
 class CardHand {
   List<String> hand;
   Map<String, int> cardCounts;
+  int wager;
   static const Map<String, int> cardRank = {
     'A': 13,
     'K': 12,
@@ -43,7 +54,7 @@ class CardHand {
     '2': 1,
   };
 
-  CardHand(this.hand) : cardCounts = _calculateCardCounts(hand);
+  CardHand(this.hand, this.wager) : cardCounts = _calculateCardCounts(hand);
 
   static Map<String, int> _calculateCardCounts(List<String> hand) {
     var counts = <String, int>{};
@@ -64,7 +75,7 @@ class CardHand {
         int rank1 = CardHand.cardRank[hand1.hand[i]]!;
         int rank2 = CardHand.cardRank[hand2.hand[i]]!;
         if (rank1 != rank2) {
-          return rank1 - rank2;
+          return rank2 - rank1;
         }
       }
     }
@@ -91,6 +102,13 @@ class CardHand {
     }
   }
 
+  @override
+  String toString() {
+    // TODO: implement toString
+    // return super.toString();
+    return 'hand: $hand card counts: $cardCounts wager: $wager';
+  }
+
   static int _compareByClassification(String classification1, String classification2) {
     const order = ['5 of a kind', '4 of a kind', 'Full house', '3 of a kind', '2 pair', '1 pair', 'None'];
     int index1 = order.indexOf(classification1);
@@ -98,4 +116,8 @@ class CardHand {
 
     return index1 - index2; // Return the difference in index
   }
+}
+
+void sortHands(List<CardHand> hands) {
+  hands.sort(CardHand.compareHands);
 }
